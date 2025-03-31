@@ -1,44 +1,45 @@
 using OrderManagement.Domain.Entities;
+using OrderManagement.Domain.Repositories;
 using OrderManagement.Infrastructure.Data;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace OrderManagement.Application.Services
+namespace OrderManagement.Infrastructure.Repositories
 {
-    public class ProductService
+    public class ProductRepository : IProductRepository
     {
         private readonly OrderManagementDbContext _context;
 
-        public ProductService(OrderManagementDbContext context)
+        public ProductRepository(OrderManagementDbContext context)
         {
             _context = context;
         }
 
-        public IEnumerable<Product> GetProducts()
-        {
-            return _context.Products.ToList();
-        }
-
-        public Product GetProductById(int id)
+        public Product GetById(int id)
         {
             return _context.Products.FirstOrDefault(p => p.Id == id);
         }
 
-        public void CreateProduct(Product product)
+        public IEnumerable<Product> GetAll()
+        {
+            return _context.Products.ToList();
+        }
+
+        public void Add(Product product)
         {
             _context.Products.Add(product);
             _context.SaveChanges();
         }
 
-        public void UpdateProduct(Product product)
+        public void Update(Product product)
         {
             _context.Products.Update(product);
             _context.SaveChanges();
         }
 
-        public void DeleteProduct(int id)
+        public void Delete(int id)
         {
-            var product = _context.Products.FirstOrDefault(p => p.Id == id);
+            var product = GetById(id);
             if (product != null)
             {
                 _context.Products.Remove(product);

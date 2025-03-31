@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OrderManagement.Application.Services;
 using OrderManagement.Domain.Entities;
+using System.Linq;
 
 namespace OrderManagement.API.Controllers
 {
@@ -16,10 +17,19 @@ namespace OrderManagement.API.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetOrders()
+        public IActionResult GetOrders([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var orders = _orderService.GetOrders();
-            return Ok(orders);
+            var (orders, totalCount) = _orderService.GetOrders(pageNumber, pageSize);
+
+            var response = new
+            {
+                TotalCount = totalCount,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                Orders = orders
+            };
+
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
@@ -34,23 +44,8 @@ namespace OrderManagement.API.Controllers
         public IActionResult CreateOrder([FromBody] Order order)
         {
             _orderService.CreateOrder(order);
-
-            var response = new
-            {
-                id = order.Id,
-                cliente = order.Cliente,
-                fechaCreacion = order.FechaCreacion,
-                total = order.Total,
-                products = order.OrderProducts.Select(op => new
-                {
-                    productId = op.ProductId,
-                    quantity = op.Quantity
-                })
-            };
-
-            return CreatedAtAction(nameof(GetOrderById), new { id = order.Id }, response);
+            return CreatedAtAction(nameof(GetOrderById), new { id = order.Id }, order);
         }
-
 
         [HttpPut("{id}")]
         public IActionResult UpdateOrder(int id, [FromBody] Order order)

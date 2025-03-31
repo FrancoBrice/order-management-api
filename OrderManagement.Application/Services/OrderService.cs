@@ -1,28 +1,35 @@
 using OrderManagement.Domain.Entities;
-using OrderManagement.Infrastructure.Data;
+using OrderManagement.Domain.Repositories;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace OrderManagement.Application.Services
 {
     public class OrderService
     {
-        private readonly OrderManagementDbContext _context;
+        private readonly IOrderRepository _orderRepository;
+        private readonly IProductRepository _productRepository;
 
-        public OrderService(OrderManagementDbContext context)
+        public OrderService(IOrderRepository orderRepository, IProductRepository productRepository)
         {
-            _context = context;
+            _orderRepository = orderRepository;
+            _productRepository = productRepository;
         }
 
+        // Método privado para calcular el descuento de la orden
         private decimal CalculateDiscount(Order order)
         {
             decimal discount = 0;
             decimal subtotal = order.Total;
 
+            // Descuento del 10% si el subtotal es mayor a $500
             if (subtotal > 500)
             {
                 discount += subtotal * 0.10m;
                 subtotal -= discount;
             }
 
+            // Descuento adicional del 5% si hay más de 5 productos distintos
             if (order.OrderProducts.Select(op => op.ProductId).Distinct().Count() > 5)
             {
                 discount += subtotal * 0.05m;
@@ -31,55 +38,48 @@ namespace OrderManagement.Application.Services
             return discount;
         }
 
-        public IEnumerable<Order> GetOrders()
+        public (IEnumerable<Order> orders, int totalCount) GetOrders(int pageNumber, int pageSize)
         {
-            return _context.Orders.ToList();
+            var orders = _orderRepository.GetOrders(pageNumber, pageSize);
+            var totalCount = _orderRepository.GetTotalOrdersCount();
+            return (orders, totalCount);
         }
 
         public Order GetOrderById(int id)
         {
-            return _context.Orders.FirstOrDefault(o => o.Id == id);
+            return _orderRepository.GetById(id);
         }
 
         public void CreateOrder(Order order)
         {
+            // Calcular el total de la orden sumando el precio * cantidad de cada producto
             decimal total = order.OrderProducts
-                .Sum(op => _context.Products
-                .Where(p => p.Id == op.ProductId)
-                .Select(p => p.Precio * op.Quantity)
-                .FirstOrDefault());
+                .Sum(op => _productRepository.GetById(op.ProductId)?.Precio * op.Quantity ?? 0);
+
+            order.Total = total;
+            // Aplicar el descuento calculado
+            decimal discount = CalculateDiscount(order);
+            order.Total -= discount;
+
+            _orderRepository.Add(order);
+        }
+
+        public void UpdateOrder(Order order)
+        {
+            // Recalcular el total y el descuento en caso de modificación
+            decimal total = order.OrderProducts
+                .Sum(op => _productRepository.GetById(op.ProductId)?.Precio * op.Quantity ?? 0);
 
             order.Total = total;
             decimal discount = CalculateDiscount(order);
             order.Total -= discount;
 
-            foreach (var orderProduct in order.OrderProducts)
-            {
-                orderProduct.Order = null;
-                orderProduct.Product = null;
-            }
-
-            _context.Orders.Add(order);
-            _context.SaveChanges();
-        }
-
-        public void UpdateOrder(Order order)
-        {
-            decimal discount = CalculateDiscount(order);
-            order.Total -= discount;
-
-            _context.Orders.Update(order);
-            _context.SaveChanges();
+            _orderRepository.Update(order);
         }
 
         public void DeleteOrder(int id)
         {
-            var order = _context.Orders.FirstOrDefault(o => o.Id == id);
-            if (order != null)
-            {
-                _context.Orders.Remove(order);
-                _context.SaveChanges();
-            }
+            _orderRepository.Delete(id);
         }
     }
 }
