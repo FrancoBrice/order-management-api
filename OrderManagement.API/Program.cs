@@ -32,12 +32,27 @@ builder.Services.AddScoped<ProductService>();
 
 var app = builder.Build();
 
-// Configuración de entorno de desarrollo
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
+
+        var response = new
+        {
+            error = "Ocurrió un error inesperado. Por favor intenta más tarde."
+        };
+
+        await context.Response.WriteAsJsonAsync(response);
+    });
+});
 
 app.UseAuthorization();
 app.MapControllers();

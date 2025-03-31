@@ -31,7 +31,10 @@ namespace OrderManagement.Infrastructure.Repositories
 
         public Order GetById(int id)
         {
-            return _context.Orders.FirstOrDefault(o => o.Id == id);
+            return _context.Orders
+                .Include(o => o.OrderProducts)
+                    .ThenInclude(op => op.Product)
+                .FirstOrDefault(o => o.Id == id);
         }
 
         public void Add(Order order)
@@ -42,8 +45,21 @@ namespace OrderManagement.Infrastructure.Repositories
 
         public void Update(Order order)
         {
-            _context.Orders.Update(order);
-            _context.SaveChanges();
+            var existingOrder = _context.Orders
+                .Include(o => o.OrderProducts)
+                .FirstOrDefault(o => o.Id == order.Id);
+
+            if (existingOrder != null)
+            {
+                existingOrder.Cliente = order.Cliente;
+                existingOrder.Total = order.Total;
+                existingOrder.FechaCreacion = order.FechaCreacion;
+
+                _context.OrderProducts.RemoveRange(existingOrder.OrderProducts); 
+                existingOrder.OrderProducts = order.OrderProducts;               
+
+                _context.SaveChanges();
+            }
         }
 
         public void Delete(int id)
