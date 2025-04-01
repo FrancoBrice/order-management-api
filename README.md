@@ -1,7 +1,7 @@
 # 🚀 Cómo ejecutar 
 
 1. 🛠️ Clona el repositorio:
-```
+```bash
 git clone https://github.com/FrancoBrice/order-management-api.git
 cd OrderManagementAPI
 ```
@@ -12,7 +12,7 @@ SA_PASSWORD=YourStrongPassw0rd
 ```
 
 3. 🐳 Ejecuta el contenedor Docker:
-```
+```bash
 docker-compose up --build
 ```
 
@@ -22,9 +22,9 @@ http://localhost:5000/swagger
 ```
 Aquí podrás ver la documentación de la API y probar los endpoints.  Cómo ejecutar 
 
-## 🧪 Pruebas con Postman
+## Pruebas con Postman
 
-Puedes probar los endpoints desde Postman o cualquier cliente HTTP. A continuación, algunos ejemplos:
+Puedes probar los endpoints desde Postman. Aquí tienes ejemplos de cómo hacerlo:
 
 ### Productos
 - GET /productos: Lista todos los productos.
@@ -84,7 +84,10 @@ Antes de crear órdenes debes crear productos en la base de datos con el endpoin
 
 
 
-
-
-
+# Ejecutar pruebas unitarias
+En una terminal en la raiz del proyecto, ejecuta los siguientes comandos para compilar y ejecutar las pruebas unitarias:
+```bash
+dotnet build
+dotnet test
+```
 
