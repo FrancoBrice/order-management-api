@@ -32,10 +32,6 @@ TestResults/
 *.pdb
 *.mdb
 
-docker-compose.override.yml
-docker-compose*.yml
-Dockerfile
-
 .vs/
 *.sqlproj
 *.sqlproj.user
