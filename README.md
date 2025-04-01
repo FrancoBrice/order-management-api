@@ -28,6 +28,7 @@ Puedes probar los endpoints desde Postman o cualquier cliente HTTP. A continuaci
 
 ### Productos
 - GET /productos: Lista todos los productos.
+![alt text](images/image-5.png)
 
 - POST /productos: Crea un nuevo producto. Ejemplo:
 
@@ -37,12 +38,17 @@ Puedes probar los endpoints desde Postman o cualquier cliente HTTP. A continuaci
   "precio": 300
 }
 ```
+![alt text](images/image-4.png)
 
 ### Órdenes
 Antes de crear órdenes debes crear productos en la base de datos con el endpoint `POST /productos`.
 
 - `GET /ordenes`: Obtiene todas las órdenes de compra (soporta paginación con `?pageNumber=1&pageSize=10`).
+![alt text](images/image.png)
+
 - `GET /ordenes/{id}`: Obtiene una orden específica por su ID.
+![alt text](images/image-2.png)
+
 - `POST /ordenes`: Crea una nueva orden. Envia un JSON como este:
 
 ```json
@@ -55,6 +61,8 @@ Antes de crear órdenes debes crear productos en la base de datos con el endpoin
   ]
 }
 ```
+
+![alt text](images/image-1.png)
 
 - PUT /ordenes/{id}: Actualiza una orden existente. Debes enviar el id también en el body:
 
@@ -69,5 +77,14 @@ Antes de crear órdenes debes crear productos en la base de datos con el endpoin
   ]
 }
 ```
+![alt text](images/image-3.png)
+
 - DELETE /ordenes/{id}: Elimina una orden por su ID.
+![alt text](images/image-6.png)
+
+
+
+
+
+
 
