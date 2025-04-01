@@ -32,7 +32,7 @@ namespace OrderManagement.Infrastructure.Repositories
             return _context.Orders.Count();
         }
 
-        public Order GetById(int id)
+        public Order? GetById(int id)
         {
             return _context.Orders
                 .AsNoTracking()
@@ -72,18 +72,19 @@ namespace OrderManagement.Infrastructure.Repositories
             _context.SaveChanges();
         }
 
-        public void Delete(int id)
+        public bool Delete(int id)
         {
             var order = _context.Orders
                 .Include(o => o.OrderProducts)
                 .FirstOrDefault(o => o.Id == id);
 
-            if (order != null)
-            {
-                _context.OrderProducts.RemoveRange(order.OrderProducts);
-                _context.Orders.Remove(order);
-                _context.SaveChanges();
-            }
+            if (order == null)
+                return false;
+
+            _context.OrderProducts.RemoveRange(order.OrderProducts);
+            _context.Orders.Remove(order);
+            _context.SaveChanges();
+            return true;
         }
     }
 }

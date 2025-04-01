@@ -87,9 +87,13 @@ namespace OrderManagement.Application.Services
             _orderRepository.Update(order);
         }
 
-        public void DeleteOrder(int id)
+        public bool DeleteOrder(int id)
         {
+            var order = _orderRepository.GetById(id);
+            if (order == null) return false;
+
             _orderRepository.Delete(id);
+            return true;
         }
     }
 }

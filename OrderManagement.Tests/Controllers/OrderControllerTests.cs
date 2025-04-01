@@ -120,11 +120,30 @@ namespace OrderManagement.Tests
         [Fact]
         public void DeleteOrder_ExistingId_ReturnsNoContent()
         {
+            // Arrange
+            var order = new Order { Id = 1, Cliente = "John Doe", Total = 100 };
+
+            _orderRepositoryMock.Setup(repo => repo.GetById(1)).Returns(order);
             _orderRepositoryMock.Setup(repo => repo.Delete(1));
 
+            // Act
             var result = _orderController.DeleteOrder(1);
 
+            // Debug
+            Console.WriteLine($"Tipo de resultado: {result?.GetType().Name ?? "null"}");
+
+            // Assert
             Assert.IsType<NoContentResult>(result);
+        }
+
+        [Fact]
+        public void DeleteOrder_NonExistingId_ReturnsNotFound()
+        {
+            _orderRepositoryMock.Setup(repo => repo.GetById(999)).Returns((Order)null);  
+
+            var result = _orderController.DeleteOrder(999);
+
+            Assert.IsType<NotFoundResult>(result);
         }
     }
 }

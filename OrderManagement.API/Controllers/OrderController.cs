@@ -57,7 +57,8 @@ namespace OrderManagement.API.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteOrder(int id)
         {
-            _orderService.DeleteOrder(id);
+            var deleted = _orderService.DeleteOrder(id);
+            if (!deleted) return NotFound();
             return NoContent();
         }
     }

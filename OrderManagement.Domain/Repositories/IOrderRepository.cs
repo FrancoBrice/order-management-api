@@ -7,9 +7,9 @@ namespace OrderManagement.Domain.Repositories
     {
         IEnumerable<Order> GetOrders(int pageNumber, int pageSize);
         int GetTotalOrdersCount();
-        Order GetById(int id);
+        Order? GetById(int id);
         void Add(Order order);
         void Update(Order order);
-        void Delete(int id);
+        bool Delete(int id);
     }
 }
