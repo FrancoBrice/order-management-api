@@ -19,6 +19,9 @@ namespace OrderManagement.Infrastructure.Repositories
         public IEnumerable<Order> GetOrders(int pageNumber, int pageSize)
         {
             return _context.Orders
+                .AsNoTracking()
+                .Include(o => o.OrderProducts)
+                    .ThenInclude(op => op.Product)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
@@ -32,6 +35,7 @@ namespace OrderManagement.Infrastructure.Repositories
         public Order GetById(int id)
         {
             return _context.Orders
+                .AsNoTracking()
                 .Include(o => o.OrderProducts)
                     .ThenInclude(op => op.Product)
                 .FirstOrDefault(o => o.Id == id);
@@ -49,32 +53,37 @@ namespace OrderManagement.Infrastructure.Repositories
                 .Include(o => o.OrderProducts)
                 .FirstOrDefault(o => o.Id == order.Id);
 
-            if (existingOrder != null)
+            if (existingOrder == null) return;
+
+            existingOrder.Cliente = order.Cliente;
+            existingOrder.FechaCreacion = order.FechaCreacion;
+            existingOrder.Total = order.Total;
+
+            _context.OrderProducts.RemoveRange(existingOrder.OrderProducts);
+            foreach (var op in order.OrderProducts)
             {
-                existingOrder.Cliente = order.Cliente;
-                existingOrder.Total = order.Total;
-                existingOrder.FechaCreacion = order.FechaCreacion;
-
-                _context.OrderProducts.RemoveRange(existingOrder.OrderProducts); 
-                existingOrder.OrderProducts = order.OrderProducts;               
-
-                _context.SaveChanges();
+                existingOrder.OrderProducts.Add(new OrderProduct
+                {
+                    ProductId = op.ProductId,
+                    Quantity = op.Quantity
+                });
             }
+
+            _context.SaveChanges();
         }
 
         public void Delete(int id)
         {
-            var order = GetById(id);
+            var order = _context.Orders
+                .Include(o => o.OrderProducts)
+                .FirstOrDefault(o => o.Id == id);
+
             if (order != null)
             {
+                _context.OrderProducts.RemoveRange(order.OrderProducts);
                 _context.Orders.Remove(order);
                 _context.SaveChanges();
             }
         }
-
-    public IEnumerable<Order> GetAll()
-    {
-      throw new NotImplementedException();
     }
-  }
 }

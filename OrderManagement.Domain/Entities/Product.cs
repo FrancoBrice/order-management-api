@@ -16,6 +16,7 @@ namespace OrderManagement.Domain.Entities
         [Column(TypeName = "decimal(18,2)")]
         public decimal Precio { get; set; }
 
+        [JsonIgnore]
         public ICollection<OrderProduct> OrderProducts { get; set; } = new List<OrderProduct>();
     }
 }

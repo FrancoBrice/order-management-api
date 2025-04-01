@@ -3,9 +3,7 @@ using OrderManagement.Infrastructure.Data;
 using OrderManagement.Application.Services;
 using OrderManagement.Infrastructure.Repositories;
 using OrderManagement.Domain.Repositories;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
+
 
 var builder = WebApplication.CreateBuilder(args);
 

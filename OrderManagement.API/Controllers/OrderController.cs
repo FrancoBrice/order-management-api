@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using OrderManagement.Application.Services;
 using OrderManagement.Domain.Entities;
-using System.Linq;
 
 namespace OrderManagement.API.Controllers
 {
