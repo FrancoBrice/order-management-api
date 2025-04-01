@@ -58,7 +58,7 @@ namespace OrderManagement.Tests
         }
 
         [Fact]
-        public void CreateOrder_Applies5PercentDiscount_WhenTotalIsLessOrEqual500_ButManyDistinctProducts()
+        public void CreateOrder_NoDiscount_WhenTotalIsLessOrEqual500_ButManyDistinctProducts()
         {
             var order = new Order
             {
@@ -74,12 +74,8 @@ namespace OrderManagement.Tests
             };
 
             var productRepoMock = new Mock<IProductRepository>();
-            productRepoMock.Setup(repo => repo.GetById(1)).Returns(new Product { Id = 1, Precio = 50 });
-            productRepoMock.Setup(repo => repo.GetById(2)).Returns(new Product { Id = 2, Precio = 50 });
-            productRepoMock.Setup(repo => repo.GetById(3)).Returns(new Product { Id = 3, Precio = 50 });
-            productRepoMock.Setup(repo => repo.GetById(4)).Returns(new Product { Id = 4, Precio = 50 });
-            productRepoMock.Setup(repo => repo.GetById(5)).Returns(new Product { Id = 5, Precio = 50 });
-            productRepoMock.Setup(repo => repo.GetById(6)).Returns(new Product { Id = 6, Precio = 150 });
+            productRepoMock.Setup(repo => repo.GetById(It.IsAny<int>()))
+                .Returns<int>(id => new Product { Id = id, Precio = 50 }); // Total = 300
 
             var orderRepoMock = new Mock<IOrderRepository>();
 
@@ -87,7 +83,8 @@ namespace OrderManagement.Tests
 
             service.CreateOrder(order);
 
-            Assert.Equal(380, order.Total);
+            // No aplica ningún descuento porque el total es <= 500
+            Assert.Equal(300, order.Total);
         }
 
         [Fact]

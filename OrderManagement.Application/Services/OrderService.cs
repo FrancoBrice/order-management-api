@@ -1,7 +1,5 @@
 using OrderManagement.Domain.Entities;
 using OrderManagement.Domain.Repositories;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace OrderManagement.Application.Services
 {
@@ -16,7 +14,6 @@ namespace OrderManagement.Application.Services
             _productRepository = productRepository;
         }
 
-        // Método privado para calcular el descuento de la orden
         private decimal CalculateDiscount(Order order)
         {
             decimal discount = 0;
@@ -27,16 +24,29 @@ namespace OrderManagement.Application.Services
             {
                 discount += subtotal * 0.10m;
                 subtotal -= discount;
-            }
 
-            // Descuento adicional del 5% si hay más de 5 productos distintos
-            if (order.OrderProducts.Select(op => op.ProductId).Distinct().Count() > 5)
-            {
-                discount += subtotal * 0.05m;
+                // Descuento adicional del 5% si hay más de 5 productos distintos
+                if (CountDistinctProductIds(order.OrderProducts) > 5)
+                {
+                    discount += subtotal * 0.05m;
+                }
             }
-
             return discount;
         }
+
+        private int CountDistinctProductIds(List<OrderProduct> orderProducts)
+        {
+            var productIds = new List<int>();
+            foreach (var op in orderProducts)
+            {
+                if (!productIds.Contains(op.ProductId))
+                {
+                    productIds.Add(op.ProductId);
+                }
+            }
+            return productIds.Count;
+        }
+
 
         public (IEnumerable<Order> orders, int totalCount) GetOrders(int pageNumber, int pageSize)
         {
