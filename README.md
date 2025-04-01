@@ -1,5 +1,5 @@
 # 🚀 Cómo ejecutar 
-
+Debes tener instalado Docker y Docker Compose. Si no lo tienes, puedes seguir la [guía de instalación de Docker](https://docs.docker.com/get-docker/).
 1. 🛠️ Clona el repositorio:
 ```bash
 git clone https://github.com/FrancoBrice/order-management-api.git
